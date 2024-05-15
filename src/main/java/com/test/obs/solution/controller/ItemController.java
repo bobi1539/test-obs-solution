@@ -30,4 +30,9 @@ public class ItemController {
     ) {
         return itemService.edit(id, request);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        itemService.delete(id);
+    }
 }

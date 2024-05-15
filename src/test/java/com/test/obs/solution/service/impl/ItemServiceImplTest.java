@@ -70,10 +70,43 @@ class ItemServiceImplTest {
         verify(itemRepository, times(1)).findById(any());
     }
 
+    @Test
+    void testDeleteSuccess() {
+        Long id = 1L;
+
+        Item itemForDelete = Item.builder()
+                .id(id)
+                .name("item 1")
+                .price(1000f)
+                .build();
+        when(itemRepository.findById(id)).thenReturn(Optional.of(itemForDelete));
+
+        assertDoesNotThrow(() -> itemService.delete(id));
+
+        verify(itemRepository, times(1)).findById(id);
+        verify(itemRepository, times(1)).delete(itemForDelete);
+    }
+
+    @Test
+    void testDeleteFailed() {
+        Long id = 1L;
+        when(itemRepository.findById(id)).thenReturn(Optional.empty());
+
+        BusinessException e = assertThrows(BusinessException.class, () -> itemService.delete(id));
+        assertEquals(Constant.DATA_NOT_EXIST, e.getMessage());
+    }
+
     private ItemSaveOrEditRequest saveRequest() {
         return ItemSaveOrEditRequest.builder()
                 .name("Item 1")
                 .price(10_000f)
+                .build();
+    }
+
+    private ItemSaveOrEditRequest editRequest() {
+        return ItemSaveOrEditRequest.builder()
+                .name("Item 1000")
+                .price(50_000f)
                 .build();
     }
 
@@ -82,13 +115,6 @@ class ItemServiceImplTest {
                 .id(1L)
                 .name(request.getName())
                 .price(request.getPrice())
-                .build();
-    }
-
-    private ItemSaveOrEditRequest editRequest() {
-        return ItemSaveOrEditRequest.builder()
-                .name("Item 1000")
-                .price(50_000f)
                 .build();
     }
 }

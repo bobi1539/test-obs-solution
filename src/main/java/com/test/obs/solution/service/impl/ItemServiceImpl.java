@@ -34,6 +34,12 @@ public class ItemServiceImpl implements ItemService {
         return EntityHelper.toItemSaveOrEditResponse(itemUpdated);
     }
 
+    @Override
+    public void delete(Long id) {
+        Item item = findItemById(id);
+        itemRepository.delete(item);
+    }
+
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.DATA_NOT_EXIST)

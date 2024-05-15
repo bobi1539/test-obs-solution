@@ -8,4 +8,6 @@ public interface ItemService {
     ItemSaveOrEditResponse save(ItemSaveOrEditRequest request);
 
     ItemSaveOrEditResponse edit(Long id, ItemSaveOrEditRequest request);
+
+    void delete(Long id);
 }
