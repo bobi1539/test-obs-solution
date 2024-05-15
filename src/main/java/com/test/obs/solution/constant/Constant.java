@@ -11,4 +11,6 @@ public final class Constant {
     public static final String ERROR = "Error : ";
     public static final String SUCCESS = "Success";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+    public static final String NAME_REQUIRED = "Name is required";
+    public static final String PRICE_REQUIRED = "Price is required";
 }
