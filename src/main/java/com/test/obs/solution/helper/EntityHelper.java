@@ -1,7 +1,7 @@
 package com.test.obs.solution.helper;
 
 import com.test.obs.solution.constant.GlobalMessage;
-import com.test.obs.solution.dto.request.ItemSaveRequest;
+import com.test.obs.solution.dto.request.ItemSaveOrEditRequest;
 import com.test.obs.solution.dto.response.ItemSaveOrEditResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
@@ -12,7 +12,7 @@ public final class EntityHelper {
         throw new BusinessException(GlobalMessage.CANNOT_INSTANCE_HELPER_CLASS);
     }
 
-    public static ItemSaveOrEditResponse toItemCreateOrUpdateResponse(Item item) {
+    public static ItemSaveOrEditResponse toItemSaveOrEditResponse(Item item) {
         return ItemSaveOrEditResponse.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -20,7 +20,7 @@ public final class EntityHelper {
                 .build();
     }
 
-    public static Item toItem(ItemSaveRequest request) {
+    public static Item toItem(ItemSaveOrEditRequest request) {
         return Item.builder()
                 .name(request.getName())
                 .price(request.getPrice())
