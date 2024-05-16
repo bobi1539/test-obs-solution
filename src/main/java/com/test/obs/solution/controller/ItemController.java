@@ -35,4 +35,12 @@ public class ItemController {
     public void delete(@PathVariable Long id) {
         itemService.delete(id);
     }
+
+    @GetMapping("/{id}")
+    public ItemResponse getById(
+            @PathVariable Long id,
+            @RequestParam(required = false) boolean showStock
+    ) {
+        return itemService.getById(id, showStock);
+    }
 }

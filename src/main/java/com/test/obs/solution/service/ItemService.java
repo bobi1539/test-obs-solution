@@ -10,4 +10,6 @@ public interface ItemService {
     ItemResponse edit(Long id, ItemRequest request);
 
     void delete(Long id);
+
+    ItemResponse getById(Long id, boolean showStock);
 }

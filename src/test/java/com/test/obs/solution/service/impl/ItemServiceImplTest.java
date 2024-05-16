@@ -96,6 +96,22 @@ class ItemServiceImplTest {
         assertEquals(Constant.ITEM_NOT_EXIST, e.getMessage());
     }
 
+    @Test
+    void testGetByIdSuccess() {
+        Long id = 1L;
+        Item item = buildItem();
+        when(itemRepository.findById(id)).thenReturn(Optional.of(item));
+
+        assertDoesNotThrow(() -> {
+            ItemResponse response = itemService.getById(id, false);
+            assertEquals(item.getId(), response.getId());
+            assertEquals(item.getName(), response.getName());
+            assertEquals(item.getPrice(), response.getPrice());
+        });
+
+        verify(itemRepository, times(1)).findById(id);
+    }
+
     private ItemRequest saveRequest() {
         return ItemRequest.builder()
                 .name("Item 1")
@@ -115,6 +131,14 @@ class ItemServiceImplTest {
                 .id(1L)
                 .name(request.getName())
                 .price(request.getPrice())
+                .build();
+    }
+
+    private Item buildItem() {
+        return Item.builder()
+                .id(1L)
+                .name("Item 1")
+                .price(1_000F)
                 .build();
     }
 }
