@@ -6,4 +6,6 @@ import com.test.obs.solution.dto.response.InventoryResponse;
 public interface InventoryService {
 
     InventoryResponse save(InventoryRequest request);
+
+    InventoryResponse edit(Long id, InventoryRequest request);
 }

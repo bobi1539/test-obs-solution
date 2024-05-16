@@ -28,7 +28,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public InventoryResponse save(InventoryRequest request) {
         Item item = findItemById(request.getItemId());
-        checkStockItem(item, request);
+        checkStockItemWhenSave(item, request);
 
         Inventory inventory = Inventory.builder()
                 .item(item)
@@ -39,13 +39,26 @@ public class InventoryServiceImpl implements InventoryService {
         return EntityHelper.toInventoryResponse(inventorySaved);
     }
 
+    @Override
+    public InventoryResponse edit(Long id, InventoryRequest request) {
+        Inventory inventory = findInventoryById(id);
+        Item item = findItemById(request.getItemId());
+        checkStockItemWhenEdit(item, inventory, request);
+
+        inventory.setItem(item);
+        inventory.setQuantity(request.getQuantity());
+        inventory.setInventoryType(request.getInventoryType());
+        Inventory inventoryUpdated = inventoryRepository.save(inventory);
+        return EntityHelper.toInventoryResponse(inventoryUpdated);
+    }
+
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)
         );
     }
 
-    private void checkStockItem(Item item, InventoryRequest request) {
+    private void checkStockItemWhenSave(Item item, InventoryRequest request) {
         int prevStock = calculateStock(item);
         int currentStock;
         if (request.getInventoryType().equals(InventoryType.T)) {
@@ -53,14 +66,34 @@ public class InventoryServiceImpl implements InventoryService {
         } else {
             currentStock = prevStock - request.getQuantity();
         }
-
-        if (currentStock < 0) {
-            throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
-        }
+        validateStock(currentStock);
     }
 
     private int calculateStock(Item item) {
         List<Inventory> inventories = inventoryRepository.findByItem(item);
         return Helper.calculateStockItem(inventories);
+    }
+
+    private Inventory findInventoryById(Long id) {
+        return inventoryRepository.findById(id).orElseThrow(
+                () -> new BusinessException(GlobalMessage.INVENTORY_NOT_EXIST)
+        );
+    }
+
+    private void checkStockItemWhenEdit(Item item, Inventory inventory, InventoryRequest request) {
+        int prevStock = calculateStock(item);
+        int currentStock;
+        if (request.getInventoryType().equals(InventoryType.T)) {
+            currentStock = prevStock + request.getQuantity();
+        } else {
+            currentStock = prevStock - request.getQuantity() + inventory.getQuantity();
+        }
+        validateStock(currentStock);
+    }
+
+    private void validateStock(int stock) {
+        if (stock < 0) {
+            throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
+        }
     }
 }

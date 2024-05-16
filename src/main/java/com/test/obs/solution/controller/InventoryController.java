@@ -7,10 +7,7 @@ import com.test.obs.solution.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Endpoint.INVENTORY)
@@ -22,5 +19,13 @@ public class InventoryController {
     @PostMapping
     public InventoryResponse save(@RequestBody @Valid InventoryRequest request) {
         return inventoryService.save(request);
+    }
+
+    @PutMapping("/{id}")
+    public InventoryResponse edit(
+            @PathVariable Long id,
+            @RequestBody @Valid InventoryRequest request
+    ) {
+        return inventoryService.edit(id, request);
     }
 }

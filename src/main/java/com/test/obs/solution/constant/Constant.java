@@ -14,6 +14,7 @@ public final class Constant {
     public static final String NAME_REQUIRED = "Name is required";
     public static final String PRICE_REQUIRED = "Price is required";
     public static final String ITEM_NOT_EXIST = "Item not exist";
+    public static final String INVENTORY_NOT_EXIST = "Inventory not exist";
     public static final String ITEM_ID_REQUIRED = "Item id is required";
     public static final String QUANTITY_REQUIRED = "Quantity is required";
     public static final String INVENTORY_TYPE_REQUIRED = "Type is required";
