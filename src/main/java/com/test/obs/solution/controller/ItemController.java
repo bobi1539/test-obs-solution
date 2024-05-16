@@ -1,8 +1,8 @@
 package com.test.obs.solution.controller;
 
 import com.test.obs.solution.constant.Endpoint;
-import com.test.obs.solution.dto.request.ItemSaveOrEditRequest;
-import com.test.obs.solution.dto.response.ItemSaveOrEditResponse;
+import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -17,16 +17,16 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemSaveOrEditResponse save(
-            @RequestBody @Valid ItemSaveOrEditRequest request
+    public ItemResponse save(
+            @RequestBody @Valid ItemRequest request
     ) {
         return itemService.save(request);
     }
 
     @PutMapping("/{id}")
-    public ItemSaveOrEditResponse edit(
+    public ItemResponse edit(
             @PathVariable Long id,
-            @RequestBody @Valid ItemSaveOrEditRequest request
+            @RequestBody @Valid ItemRequest request
     ) {
         return itemService.edit(id, request);
     }

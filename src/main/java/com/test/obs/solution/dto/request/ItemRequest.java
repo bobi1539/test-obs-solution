@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class ItemSaveOrEditRequest {
+public class ItemRequest {
 
     @NotNull(message = Constant.NAME_REQUIRED)
     @NotEmpty(message = Constant.NAME_REQUIRED)

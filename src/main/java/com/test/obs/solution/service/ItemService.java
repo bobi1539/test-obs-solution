@@ -1,13 +1,13 @@
 package com.test.obs.solution.service;
 
-import com.test.obs.solution.dto.request.ItemSaveOrEditRequest;
-import com.test.obs.solution.dto.response.ItemSaveOrEditResponse;
+import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.response.ItemResponse;
 
 public interface ItemService {
 
-    ItemSaveOrEditResponse save(ItemSaveOrEditRequest request);
+    ItemResponse save(ItemRequest request);
 
-    ItemSaveOrEditResponse edit(Long id, ItemSaveOrEditRequest request);
+    ItemResponse edit(Long id, ItemRequest request);
 
     void delete(Long id);
 }

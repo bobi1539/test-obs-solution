@@ -1,8 +1,8 @@
 package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.GlobalMessage;
-import com.test.obs.solution.dto.request.ItemSaveOrEditRequest;
-import com.test.obs.solution.dto.response.ItemSaveOrEditResponse;
+import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.helper.EntityHelper;
@@ -19,19 +19,22 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     @Override
-    public ItemSaveOrEditResponse save(ItemSaveOrEditRequest request) {
-        Item item = EntityHelper.toItem(request);
+    public ItemResponse save(ItemRequest request) {
+        Item item = Item.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .build();
         Item itemSaved = itemRepository.save(item);
-        return EntityHelper.toItemSaveOrEditResponse(itemSaved);
+        return EntityHelper.toItemResponse(itemSaved);
     }
 
     @Override
-    public ItemSaveOrEditResponse edit(Long id, ItemSaveOrEditRequest request) {
+    public ItemResponse edit(Long id, ItemRequest request) {
         Item item = findItemById(id);
         item.setName(request.getName());
         item.setPrice(request.getPrice());
         Item itemUpdated = itemRepository.save(item);
-        return EntityHelper.toItemSaveOrEditResponse(itemUpdated);
+        return EntityHelper.toItemResponse(itemUpdated);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
 
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
-                () -> new BusinessException(GlobalMessage.DATA_NOT_EXIST)
+                () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)
         );
     }
 }

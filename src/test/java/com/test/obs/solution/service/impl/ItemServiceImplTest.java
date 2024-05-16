@@ -1,8 +1,8 @@
 package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.Constant;
-import com.test.obs.solution.dto.request.ItemSaveOrEditRequest;
-import com.test.obs.solution.dto.response.ItemSaveOrEditResponse;
+import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.repository.ItemRepository;
@@ -28,11 +28,11 @@ class ItemServiceImplTest {
 
     @Test
     void testSaveSuccess() {
-        ItemSaveOrEditRequest request = saveRequest();
+        ItemRequest request = saveRequest();
         when(itemRepository.save(any())).thenReturn(itemFromRequest(request));
 
         assertDoesNotThrow(() -> {
-            ItemSaveOrEditResponse response = itemService.save(request);
+            ItemResponse response = itemService.save(request);
             assertEquals(request.getName(), response.getName());
             assertEquals(request.getPrice(), response.getPrice());
         });
@@ -43,13 +43,13 @@ class ItemServiceImplTest {
     @Test
     void testEditSuccess() {
         Long id = 1L;
-        ItemSaveOrEditRequest request = editRequest();
+        ItemRequest request = editRequest();
 
         when(itemRepository.findById(any())).thenReturn(Optional.of(itemFromRequest(request)));
         when(itemRepository.save(any())).thenReturn(itemFromRequest(request));
 
         assertDoesNotThrow(() -> {
-            ItemSaveOrEditResponse response = itemService.edit(id, request);
+            ItemResponse response = itemService.edit(id, request);
             assertEquals(request.getName(), response.getName());
             assertEquals(request.getPrice(), response.getPrice());
         });
@@ -61,11 +61,11 @@ class ItemServiceImplTest {
     @Test
     void testEditFailed() {
         Long id = 1L;
-        ItemSaveOrEditRequest request = editRequest();
+        ItemRequest request = editRequest();
         when(itemRepository.findById(any())).thenReturn(Optional.empty());
 
         BusinessException e = assertThrows(BusinessException.class, () -> itemService.edit(id, request));
-        assertEquals(Constant.DATA_NOT_EXIST, e.getMessage());
+        assertEquals(Constant.ITEM_NOT_EXIST, e.getMessage());
 
         verify(itemRepository, times(1)).findById(any());
     }
@@ -93,24 +93,24 @@ class ItemServiceImplTest {
         when(itemRepository.findById(id)).thenReturn(Optional.empty());
 
         BusinessException e = assertThrows(BusinessException.class, () -> itemService.delete(id));
-        assertEquals(Constant.DATA_NOT_EXIST, e.getMessage());
+        assertEquals(Constant.ITEM_NOT_EXIST, e.getMessage());
     }
 
-    private ItemSaveOrEditRequest saveRequest() {
-        return ItemSaveOrEditRequest.builder()
+    private ItemRequest saveRequest() {
+        return ItemRequest.builder()
                 .name("Item 1")
                 .price(10_000f)
                 .build();
     }
 
-    private ItemSaveOrEditRequest editRequest() {
-        return ItemSaveOrEditRequest.builder()
+    private ItemRequest editRequest() {
+        return ItemRequest.builder()
                 .name("Item 1000")
                 .price(50_000f)
                 .build();
     }
 
-    private Item itemFromRequest(ItemSaveOrEditRequest request) {
+    private Item itemFromRequest(ItemRequest request) {
         return Item.builder()
                 .id(1L)
                 .name(request.getName())
