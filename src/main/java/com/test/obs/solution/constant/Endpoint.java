@@ -11,4 +11,5 @@ public final class Endpoint {
     public static final String BASE = "/api/test-obs-solution";
     public static final String ITEM = BASE + "/items";
     public static final String INVENTORY = BASE + "/inventories";
+    public static final String ORDER = BASE + "/orders";
 }

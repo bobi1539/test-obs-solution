@@ -1,16 +1,18 @@
 package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.GlobalMessage;
+import com.test.obs.solution.constant.InventoryType;
 import com.test.obs.solution.dto.request.ItemRequest;
 import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Inventory;
 import com.test.obs.solution.entity.Item;
+import com.test.obs.solution.entity.Order;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.helper.EntityHelper;
-import com.test.obs.solution.helper.Helper;
 import com.test.obs.solution.repository.InventoryRepository;
 import com.test.obs.solution.repository.ItemRepository;
+import com.test.obs.solution.repository.OrderRepository;
 import com.test.obs.solution.service.ItemService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -26,6 +29,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final InventoryRepository inventoryRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public ItemResponse save(ItemRequest request) {
@@ -60,10 +64,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemResponse getById(Long id, boolean showStock) {
         Item item = findItemById(id);
         ItemResponse response = EntityHelper.toItemResponse(item);
-        if (showStock) {
-            int stock = calculateStock(item);
-            response.setStock(stock);
-        }
+        response.setStock(showStock ? calculateStock(item) : 0);
         return response;
     }
 
@@ -79,14 +80,26 @@ public class ItemServiceImpl implements ItemService {
                 .build());
     }
 
+    @Override
+    public int calculateStock(Item item) {
+        List<Inventory> inventories = inventoryRepository.findByItem(item);
+        AtomicInteger stock = new AtomicInteger();
+        inventories.forEach(inventory -> {
+            if (inventory.getInventoryType().equals(InventoryType.T)) {
+                stock.addAndGet(inventory.getQuantity());
+            } else {
+                stock.addAndGet(-inventory.getQuantity());
+            }
+        });
+
+        List<Order> orders = orderRepository.findByItem(item);
+        orders.forEach(order -> stock.addAndGet(-order.getQuantity()));
+        return stock.get();
+    }
+
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)
         );
-    }
-
-    private int calculateStock(Item item) {
-        List<Inventory> inventories = inventoryRepository.findByItem(item);
-        return Helper.calculateStockItem(inventories);
     }
 }
