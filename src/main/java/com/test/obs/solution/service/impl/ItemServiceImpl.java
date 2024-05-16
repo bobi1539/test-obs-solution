@@ -1,7 +1,6 @@
 package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.GlobalMessage;
-import com.test.obs.solution.constant.InventoryType;
 import com.test.obs.solution.dto.request.ItemRequest;
 import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
@@ -9,6 +8,7 @@ import com.test.obs.solution.entity.Inventory;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.helper.EntityHelper;
+import com.test.obs.solution.helper.Helper;
 import com.test.obs.solution.repository.InventoryRepository;
 import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.service.ItemService;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -83,16 +82,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private int calculateStock(Item item) {
-        AtomicInteger stock = new AtomicInteger();
         List<Inventory> inventories = inventoryRepository.findByItem(item);
-
-        inventories.forEach(inventory -> {
-            if (inventory.getInventoryType().equals(InventoryType.T)) {
-                stock.addAndGet(inventory.getQuantity());
-            } else {
-                stock.addAndGet(-inventory.getQuantity());
-            }
-        });
-        return stock.get();
+        return Helper.calculateStockItem(inventories);
     }
 }
