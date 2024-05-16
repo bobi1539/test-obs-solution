@@ -3,6 +3,7 @@ package com.test.obs.solution.service.impl;
 import com.test.obs.solution.constant.GlobalMessage;
 import com.test.obs.solution.constant.InventoryType;
 import com.test.obs.solution.dto.request.InventoryRequest;
+import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.InventoryResponse;
 import com.test.obs.solution.entity.Inventory;
 import com.test.obs.solution.entity.Item;
@@ -14,6 +15,8 @@ import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.service.InventoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +59,26 @@ public class InventoryServiceImpl implements InventoryService {
     public void delete(Long id) {
         Inventory inventory = findInventoryById(id);
         inventoryRepository.delete(inventory);
+    }
+
+    @Override
+    public InventoryResponse getById(Long id) {
+        Inventory inventory = findInventoryById(id);
+        return EntityHelper.toInventoryResponse(inventory);
+    }
+
+    @Override
+    public Page<InventoryResponse> listWithPagination(PageAndSizeRequest request) {
+        request.setPage(request.getPage() - 1);
+        Page<Inventory> inventories = inventoryRepository.findAll(
+                PageRequest.of(request.getPage(), request.getSize())
+        );
+        return inventories.map(inventory -> InventoryResponse.builder()
+                .id(inventory.getId())
+                .item(EntityHelper.toItemResponse(inventory.getItem()))
+                .quantity(inventory.getQuantity())
+                .inventoryType(inventory.getInventoryType())
+                .build());
     }
 
     private Item findItemById(Long id) {
