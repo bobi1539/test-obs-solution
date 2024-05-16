@@ -19,4 +19,5 @@ public final class Constant {
     public static final String QUANTITY_REQUIRED = "Quantity is required";
     public static final String INVENTORY_TYPE_REQUIRED = "Type is required";
     public static final String ITEM_STOCK_INSUFFICIENT = "Item stock is insufficient";
+    public static final String ITEM_CANNOT_DELETE = "Item cannot be delete";
 }

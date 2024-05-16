@@ -8,4 +8,6 @@ public interface InventoryService {
     InventoryResponse save(InventoryRequest request);
 
     InventoryResponse edit(Long id, InventoryRequest request);
+
+    void delete(Long id);
 }

@@ -52,6 +52,12 @@ public class InventoryServiceImpl implements InventoryService {
         return EntityHelper.toInventoryResponse(inventoryUpdated);
     }
 
+    @Override
+    public void delete(Long id) {
+        Inventory inventory = findInventoryById(id);
+        inventoryRepository.delete(inventory);
+    }
+
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)

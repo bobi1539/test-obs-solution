@@ -9,4 +9,6 @@ import java.util.List;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     List<Inventory> findByItem(Item item);
+
+    long countByItem(Item item);
 }

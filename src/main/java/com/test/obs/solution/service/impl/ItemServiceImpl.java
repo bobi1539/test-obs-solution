@@ -49,6 +49,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void delete(Long id) {
         Item item = findItemById(id);
+        long itemInInventory = inventoryRepository.countByItem(item);
+        if (itemInInventory > 0) {
+            throw new BusinessException(GlobalMessage.ITEM_CANNOT_DELETE);
+        }
         itemRepository.delete(item);
     }
 

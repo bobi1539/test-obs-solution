@@ -28,4 +28,9 @@ public class InventoryController {
     ) {
         return inventoryService.edit(id, request);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        inventoryService.delete(id);
+    }
 }
