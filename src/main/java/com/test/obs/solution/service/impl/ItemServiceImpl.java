@@ -3,6 +3,7 @@ package com.test.obs.solution.service.impl;
 import com.test.obs.solution.constant.GlobalMessage;
 import com.test.obs.solution.constant.InventoryType;
 import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Inventory;
 import com.test.obs.solution.entity.Item;
@@ -13,6 +14,8 @@ import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.service.ItemService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,6 +62,18 @@ public class ItemServiceImpl implements ItemService {
             response.setStock(stock);
         }
         return response;
+    }
+
+    @Override
+    public Page<ItemResponse> listWithPagination(boolean showStock, PageAndSizeRequest request) {
+        request.setPage(request.getPage() - 1);
+        Page<Item> items = itemRepository.findAll(PageRequest.of(request.getPage(), request.getSize()));
+        return items.map(item -> ItemResponse.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .stock(showStock ? calculateStock(item) : 0)
+                .build());
     }
 
     private Item findItemById(Long id) {

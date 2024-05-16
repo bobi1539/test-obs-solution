@@ -2,11 +2,13 @@ package com.test.obs.solution.controller;
 
 import com.test.obs.solution.constant.Endpoint;
 import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,5 +44,18 @@ public class ItemController {
             @RequestParam(required = false) boolean showStock
     ) {
         return itemService.getById(id, showStock);
+    }
+
+    @GetMapping
+    public Page<ItemResponse> listWithPagination(
+            @RequestParam(required = false) boolean showStock,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        PageAndSizeRequest request = PageAndSizeRequest.builder()
+                .page(page)
+                .size(size)
+                .build();
+        return itemService.listWithPagination(showStock, request);
     }
 }

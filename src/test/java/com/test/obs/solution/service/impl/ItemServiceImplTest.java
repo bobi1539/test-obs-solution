@@ -2,6 +2,7 @@ package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.Constant;
 import com.test.obs.solution.dto.request.ItemRequest;
+import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
@@ -11,7 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -99,7 +105,7 @@ class ItemServiceImplTest {
     @Test
     void testGetByIdSuccess() {
         Long id = 1L;
-        Item item = buildItem();
+        Item item = buildItem(id);
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
         assertDoesNotThrow(() -> {
@@ -112,10 +118,29 @@ class ItemServiceImplTest {
         verify(itemRepository, times(1)).findById(id);
     }
 
+    @Test
+    void testListWithPaginationSuccess() {
+        PageAndSizeRequest request = PageAndSizeRequest.builder().page(1).size(10).build();
+        Pageable pageable = PageRequest.of(request.getPage() - 1, request.getSize());
+
+        Item item1 = buildItem(1L);
+        Item item2 = buildItem(2L);
+        List<Item> items = List.of(item1, item2);
+
+        when(itemRepository.findAll(pageable)).thenReturn(new PageImpl<>(items));
+
+        assertDoesNotThrow(() -> {
+            Page<ItemResponse> responses = itemService.listWithPagination(false, request);
+            assertEquals(2, responses.getSize());
+        });
+
+        verify(itemRepository, times(1)).findAll(pageable);
+    }
+
     private ItemRequest saveRequest() {
         return ItemRequest.builder()
                 .name("Item 1")
-                .price(10_000f)
+                .price(10_000F)
                 .build();
     }
 
@@ -134,9 +159,9 @@ class ItemServiceImplTest {
                 .build();
     }
 
-    private Item buildItem() {
+    private Item buildItem(long id) {
         return Item.builder()
-                .id(1L)
+                .id(id)
                 .name("Item 1")
                 .price(1_000F)
                 .build();
