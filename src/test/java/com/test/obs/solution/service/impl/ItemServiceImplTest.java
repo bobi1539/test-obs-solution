@@ -6,7 +6,9 @@ import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.ItemResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.exception.BusinessException;
+import com.test.obs.solution.repository.InventoryRepository;
 import com.test.obs.solution.repository.ItemRepository;
+import com.test.obs.solution.repository.OrderRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +33,12 @@ class ItemServiceImplTest {
 
     @Mock
     private ItemRepository itemRepository;
+
+    @Mock
+    private InventoryRepository inventoryRepository;
+
+    @Mock
+    private OrderRepository orderRepository;
 
     @Test
     void testSaveSuccess() {
@@ -86,11 +94,15 @@ class ItemServiceImplTest {
                 .price(1000f)
                 .build();
         when(itemRepository.findById(id)).thenReturn(Optional.of(itemForDelete));
+        when(orderRepository.countByItem(any())).thenReturn(0L);
+        when(inventoryRepository.countByItem(any())).thenReturn(0L);
 
         assertDoesNotThrow(() -> itemService.delete(id));
 
         verify(itemRepository, times(1)).findById(id);
         verify(itemRepository, times(1)).delete(itemForDelete);
+        verify(inventoryRepository, times(1)).countByItem(any());
+        verify(orderRepository, times(1)).countByItem(any());
     }
 
     @Test
