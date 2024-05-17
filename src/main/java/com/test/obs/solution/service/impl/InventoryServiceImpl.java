@@ -13,13 +13,12 @@ import com.test.obs.solution.helper.Helper;
 import com.test.obs.solution.repository.InventoryRepository;
 import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.service.InventoryService;
+import com.test.obs.solution.service.ItemService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -27,11 +26,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ItemRepository itemRepository;
+    private final ItemService itemService;
 
     @Override
     public InventoryResponse save(InventoryRequest request) {
         Item item = findItemById(request.getItemId());
-        checkStockItemWhenSave(item, request);
+        checkItemStockWhenSave(item, request);
 
         Inventory inventory = Inventory.builder()
                 .item(item)
@@ -46,7 +46,7 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryResponse edit(Long id, InventoryRequest request) {
         Inventory inventory = findInventoryById(id);
         Item item = findItemById(request.getItemId());
-        checkStockItemWhenEdit(item, inventory, request);
+        checkItemStockWhenEdit(item, inventory, request);
 
         inventory.setItem(item);
         inventory.setQuantity(request.getQuantity());
@@ -87,42 +87,23 @@ public class InventoryServiceImpl implements InventoryService {
         );
     }
 
-    private void checkStockItemWhenSave(Item item, InventoryRequest request) {
-        int prevStock = calculateStock(item);
-        int currentStock;
-        if (request.getInventoryType().equals(InventoryType.T)) {
-            currentStock = prevStock + request.getQuantity();
-        } else {
-            currentStock = prevStock - request.getQuantity();
-        }
-        validateStock(currentStock);
-    }
-
-    private int calculateStock(Item item) {
-        List<Inventory> inventories = inventoryRepository.findByItem(item);
-        return Helper.calculateStockItem(inventories);
-    }
-
     private Inventory findInventoryById(Long id) {
         return inventoryRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.INVENTORY_NOT_EXIST)
         );
     }
 
-    private void checkStockItemWhenEdit(Item item, Inventory inventory, InventoryRequest request) {
-        int prevStock = calculateStock(item);
-        int currentStock;
-        if (request.getInventoryType().equals(InventoryType.T)) {
-            currentStock = prevStock + request.getQuantity();
-        } else {
-            currentStock = prevStock - request.getQuantity() + inventory.getQuantity();
+    private void checkItemStockWhenSave(Item item, InventoryRequest request) {
+        int stock = itemService.calculateStock(item);
+        if (request.getInventoryType().equals(InventoryType.W)) {
+            Helper.checkItemStock(stock - request.getQuantity());
         }
-        validateStock(currentStock);
     }
 
-    private void validateStock(int stock) {
-        if (stock < 0) {
-            throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
+    private void checkItemStockWhenEdit(Item item, Inventory inventory, InventoryRequest request) {
+        int stock = itemService.calculateStock(item);
+        if (request.getInventoryType().equals(InventoryType.W)) {
+            Helper.checkItemStock(stock + inventory.getQuantity() - request.getQuantity());
         }
     }
 }

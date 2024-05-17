@@ -7,6 +7,7 @@ import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.entity.Order;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.helper.EntityHelper;
+import com.test.obs.solution.helper.Helper;
 import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.repository.OrderRepository;
 import com.test.obs.solution.service.ItemService;
@@ -59,18 +60,12 @@ public class OrderServiceImpl implements OrderService {
 
     private void checkItemStockWhenSave(Item item, int orderQuantity) {
         int stock = itemService.calculateStock(item);
-        checkItemStock(stock - orderQuantity);
+        Helper.checkItemStock(stock - orderQuantity);
     }
 
     private void checkItemStockWhenEdit(Item item, int orderQuantity, Order order) {
         int stock = itemService.calculateStock(item) + order.getQuantity();
-        checkItemStock(stock - orderQuantity);
-    }
-
-    private void checkItemStock(int stock) {
-        if (stock < 0) {
-            throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
-        }
+        Helper.checkItemStock(stock - orderQuantity);
     }
 
     private String generateOrderNumber() {
