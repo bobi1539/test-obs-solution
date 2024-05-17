@@ -28,15 +28,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse save(OrderRequest request) {
         Item item = findItemById(request.getItemId());
-        checkItemStock(item, request.getQuantity());
+        checkItemStockWhenSave(item, request.getQuantity());
         String orderNumber = generateOrderNumber();
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .item(item)
                 .quantity(request.getQuantity())
                 .build();
-        Order orderSaved = orderRepository.save(order);
-        return EntityHelper.toOrderResponse(orderSaved);
+        order = orderRepository.save(order);
+        return EntityHelper.toOrderResponse(order);
+    }
+
+    @Override
+    public OrderResponse edit(Long id, OrderRequest request) {
+        Order order = findOrderById(id);
+        Item item = findItemById(request.getItemId());
+        checkItemStockWhenEdit(item, request.getQuantity(), order);
+
+        order.setItem(item);
+        order.setQuantity(request.getQuantity());
+        order = orderRepository.save(order);
+        return EntityHelper.toOrderResponse(order);
     }
 
     private Item findItemById(Long id) {
@@ -45,9 +57,18 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
-    private void checkItemStock(Item item, int orderQuantity) {
+    private void checkItemStockWhenSave(Item item, int orderQuantity) {
         int stock = itemService.calculateStock(item);
-        if (stock - orderQuantity < 0) {
+        checkItemStock(stock - orderQuantity);
+    }
+
+    private void checkItemStockWhenEdit(Item item, int orderQuantity, Order order) {
+        int stock = itemService.calculateStock(item) + order.getQuantity();
+        checkItemStock(stock - orderQuantity);
+    }
+
+    private void checkItemStock(int stock) {
+        if (stock < 0) {
             throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
         }
     }
@@ -61,5 +82,11 @@ public class OrderServiceImpl implements OrderService {
             int number = Integer.parseInt(numberStr);
             return "O" + (number + 1);
         }
+    }
+
+    private Order findOrderById(Long id) {
+        return orderRepository.findById(id).orElseThrow(
+                () -> new BusinessException(GlobalMessage.ORDER_NOT_EXIST)
+        );
     }
 }

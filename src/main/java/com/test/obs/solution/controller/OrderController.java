@@ -7,10 +7,7 @@ import com.test.obs.solution.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Endpoint.ORDER)
@@ -22,5 +19,13 @@ public class OrderController {
     @PostMapping
     public OrderResponse save(@RequestBody @Valid OrderRequest request) {
         return orderService.save(request);
+    }
+
+    @PutMapping("/{id}")
+    public OrderResponse edit(
+            @PathVariable Long id,
+            @RequestBody @Valid OrderRequest request
+    ) {
+        return orderService.edit(id, request);
     }
 }
