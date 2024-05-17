@@ -54,9 +54,11 @@ public class ItemServiceImpl implements ItemService {
     public void delete(Long id) {
         Item item = findItemById(id);
         long itemInInventory = inventoryRepository.countByItem(item);
-        if (itemInInventory > 0) {
-            throw new BusinessException(GlobalMessage.ITEM_CANNOT_DELETE);
-        }
+        checkItemWhenDelete(itemInInventory);
+
+        long itemInOrder = orderRepository.countByItem(item);
+        checkItemWhenDelete(itemInOrder);
+
         itemRepository.delete(item);
     }
 
@@ -101,5 +103,11 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)
         );
+    }
+
+    private void checkItemWhenDelete(long itemCount) {
+        if (itemCount > 0) {
+            throw new BusinessException(GlobalMessage.ITEM_CANNOT_DELETE);
+        }
     }
 }

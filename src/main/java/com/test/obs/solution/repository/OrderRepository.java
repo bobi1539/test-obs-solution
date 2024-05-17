@@ -12,4 +12,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByItem(Item item);
 
     Optional<Order> findFirstByOrderByOrderNumberDesc();
+
+    long countByItem(Item item);
 }
