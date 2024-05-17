@@ -14,4 +14,8 @@ public final class Helper {
             throw new BusinessException(GlobalMessage.ITEM_STOCK_INSUFFICIENT);
         }
     }
+
+    public static int getPage(int page) {
+        return page - 1;
+    }
 }

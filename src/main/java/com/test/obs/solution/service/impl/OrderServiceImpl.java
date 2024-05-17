@@ -2,6 +2,7 @@ package com.test.obs.solution.service.impl;
 
 import com.test.obs.solution.constant.GlobalMessage;
 import com.test.obs.solution.dto.request.OrderRequest;
+import com.test.obs.solution.dto.request.PageAndSizeRequest;
 import com.test.obs.solution.dto.response.OrderResponse;
 import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.entity.Order;
@@ -14,6 +15,8 @@ import com.test.obs.solution.service.ItemService;
 import com.test.obs.solution.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -56,6 +59,19 @@ public class OrderServiceImpl implements OrderService {
     public void delete(Long id) {
         Order order = findOrderById(id);
         orderRepository.delete(order);
+    }
+
+    @Override
+    public OrderResponse getById(Long id) {
+        Order order = findOrderById(id);
+        return EntityHelper.toOrderResponse(order);
+    }
+
+    @Override
+    public Page<OrderResponse> listWithPagination(PageAndSizeRequest request) {
+        request.setPage(Helper.getPage(request.getPage()));
+        Page<Order> orders = orderRepository.findAll(PageRequest.of(request.getPage(), request.getSize()));
+        return orders.map(EntityHelper::toOrderResponse);
     }
 
     private Item findItemById(Long id) {

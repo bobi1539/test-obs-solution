@@ -10,6 +10,7 @@ import com.test.obs.solution.entity.Item;
 import com.test.obs.solution.entity.Order;
 import com.test.obs.solution.exception.BusinessException;
 import com.test.obs.solution.helper.EntityHelper;
+import com.test.obs.solution.helper.Helper;
 import com.test.obs.solution.repository.InventoryRepository;
 import com.test.obs.solution.repository.ItemRepository;
 import com.test.obs.solution.repository.OrderRepository;
@@ -72,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<ItemResponse> listWithPagination(boolean showStock, PageAndSizeRequest request) {
-        request.setPage(request.getPage() - 1);
+        request.setPage(Helper.getPage(request.getPage()));
         Page<Item> items = itemRepository.findAll(PageRequest.of(request.getPage(), request.getSize()));
         return items.map(item -> ItemResponse.builder()
                 .id(item.getId())

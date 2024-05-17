@@ -69,16 +69,11 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Page<InventoryResponse> listWithPagination(PageAndSizeRequest request) {
-        request.setPage(request.getPage() - 1);
+        request.setPage(Helper.getPage(request.getPage()));
         Page<Inventory> inventories = inventoryRepository.findAll(
                 PageRequest.of(request.getPage(), request.getSize())
         );
-        return inventories.map(inventory -> InventoryResponse.builder()
-                .id(inventory.getId())
-                .item(EntityHelper.toItemResponse(inventory.getItem()))
-                .quantity(inventory.getQuantity())
-                .inventoryType(inventory.getInventoryType())
-                .build());
+        return inventories.map(EntityHelper::toInventoryResponse);
     }
 
     private Item findItemById(Long id) {

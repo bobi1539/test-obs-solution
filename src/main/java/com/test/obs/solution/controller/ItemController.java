@@ -49,13 +49,12 @@ public class ItemController {
     @GetMapping
     public Page<ItemResponse> listWithPagination(
             @RequestParam(required = false) boolean showStock,
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        PageAndSizeRequest request = PageAndSizeRequest.builder()
-                .page(page)
-                .size(size)
-                .build();
-        return itemService.listWithPagination(showStock, request);
+        return itemService.listWithPagination(
+                showStock,
+                PageAndSizeRequest.builder().page(page).size(size).build()
+        );
     }
 }

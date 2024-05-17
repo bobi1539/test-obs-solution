@@ -46,10 +46,8 @@ public class InventoryController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PageAndSizeRequest request = PageAndSizeRequest.builder()
-                .page(page)
-                .size(size)
-                .build();
-        return inventoryService.listWithPagination(request);
+        return inventoryService.listWithPagination(
+                PageAndSizeRequest.builder().page(page).size(size).build()
+        );
     }
 }
