@@ -8,4 +8,6 @@ public interface OrderService {
     OrderResponse save(OrderRequest request);
 
     OrderResponse edit(Long id, OrderRequest request);
+
+    void delete(Long id);
 }

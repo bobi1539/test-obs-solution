@@ -52,6 +52,12 @@ public class OrderServiceImpl implements OrderService {
         return EntityHelper.toOrderResponse(order);
     }
 
+    @Override
+    public void delete(Long id) {
+        Order order = findOrderById(id);
+        orderRepository.delete(order);
+    }
+
     private Item findItemById(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new BusinessException(GlobalMessage.ITEM_NOT_EXIST)
